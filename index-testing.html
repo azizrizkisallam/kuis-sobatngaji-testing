@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis SobatNgaji</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50:  '#f0fdfb',
+                            100: '#ccfbf4',
+                            200: '#99f6e9',
+                            300: '#5eead6',
+                            400: '#2dd4bf',
+                            500: '#14B8A6',
+                            600: '#0d9488',
+                            700: '#0F766E',
+                            800: '#115e59',
+                            900: '#042F2E',
+                            950: '#021a19',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        body: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: #f8fffe;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ── BACKGROUND ── */
+        .bg-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background: linear-gradient(135deg, #f0fdfb 0%, #f8fffe 40%, #ecfdf9 100%);
+            overflow: hidden;
+        }
+        .bg-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.35;
+        }
+        .blob-1 {
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, #99f6e9, transparent);
+            top: -200px; right: -100px;
+        }
+        .blob-2 {
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, #5eead6, transparent);
+            bottom: -150px; left: -100px;
+        }
+        .blob-3 {
+            width: 300px; height: 300px;
+            background: radial-gradient(circle, #14B8A6, transparent);
+            top: 40%; left: 30%;
+            opacity: 0.12;
+        }
+
+        /* Islamic geometry SVG overlay */
+        .bg-pattern {
+            position: absolute;
+            inset: 0;
+            opacity: 0.028;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cpath d='M40 0 L80 20 L80 60 L40 80 L0 60 L0 20 Z' fill='none' stroke='%230F766E' stroke-width='1'/%3E%3Cpath d='M40 10 L70 25 L70 55 L40 70 L10 55 L10 25 Z' fill='none' stroke='%230F766E' stroke-width='0.5'/%3E%3Ccircle cx='40' cy='40' r='8' fill='none' stroke='%230F766E' stroke-width='0.5'/%3E%3C/svg%3E");
+            background-size: 80px 80px;
+        }
+
+        /* ── GLASS CARD ── */
+        .glass {
+            background: rgba(255,255,255,0.82);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(20,184,166,0.12);
+            box-shadow: 0 4px 24px rgba(15,118,110,0.06), 0 1px 4px rgba(15,118,110,0.04);
+        }
+        .glass-strong {
+            background: rgba(255,255,255,0.94);
+            backdrop-filter: blur(32px);
+            -webkit-backdrop-filter: blur(32px);
+            border: 1px solid rgba(20,184,166,0.15);
+            box-shadow: 0 8px 40px rgba(15,118,110,0.10), 0 2px 8px rgba(15,118,110,0.06);
+        }
+
+        /* ── HEADER ── */
+        .site-header {
+            background: rgba(255,255,255,0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(20,184,166,0.10);
+            box-shadow: 0 1px 16px rgba(15,118,110,0.06);
+        }
+
+        /* ── LOGO ── */
+        .logo-mark {
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, #14B8A6, #0F766E);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 12px rgba(15,118,110,0.25);
+        }
+
+        /* ── CUSTOM SELECT ── */
+        .custom-select-wrapper {
+            position: relative;
+        }
+        .custom-select-wrapper::after {
+            content: '';
+            position: absolute;
+            right: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0; height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 6px solid #0F766E;
+            pointer-events: none;
+        }
+        .custom-select {
+            width: 100%;
+            appearance: none;
+            -webkit-appearance: none;
+            background: rgba(255,255,255,0.9);
+            border: 1.5px solid rgba(20,184,166,0.20);
+            border-radius: 14px;
+            padding: 14px 48px 14px 18px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 15px;
+            font-weight: 500;
+            color: #1a2e2c;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+        .custom-select:focus {
+            border-color: #14B8A6;
+            box-shadow: 0 0 0 3px rgba(20,184,166,0.12);
+            background: #fff;
+        }
+        .custom-select:hover {
+            border-color: rgba(20,184,166,0.40);
+        }
+        .custom-select option { color: #1a2e2c; font-weight: 500; }
+
+        /* ── CUSTOM INPUT ── */
+        .custom-input {
+            width: 100%;
+            background: rgba(255,255,255,0.9);
+            border: 1.5px solid rgba(20,184,166,0.20);
+            border-radius: 14px;
+            padding: 14px 18px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 15px;
+            font-weight: 500;
+            color: #1a2e2c;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+        .custom-input:focus {
+            border-color: #14B8A6;
+            box-shadow: 0 0 0 3px rgba(20,184,166,0.12);
+            background: #fff;
+        }
+        .custom-input::placeholder { color: #94b5b1; font-weight: 400; }
+
+        /* ── FIELD LABEL ── */
+        .field-label {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #0F766E;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        /* ── BUTTON PRIMARY ── */
+        .btn-primary {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 16px 24px;
+            background: linear-gradient(135deg, #14B8A6 0%, #0F766E 100%);
+            color: white;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 20px rgba(15,118,110,0.30), 0 1px 4px rgba(15,118,110,0.20);
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(15,118,110,0.38), 0 2px 8px rgba(15,118,110,0.24);
+        }
+        .btn-primary:hover::before { opacity: 1; }
+        .btn-primary:active { transform: translateY(0); }
+
+        /* ── BADGE PILL ── */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+        .badge-teal {
+            background: rgba(20,184,166,0.10);
+            color: #0F766E;
+            border: 1px solid rgba(20,184,166,0.20);
+        }
+
+        /* ── RADIO OPTION ── */
+        .option-label {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            border: 1.5px solid rgba(20,184,166,0.14);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: rgba(255,255,255,0.7);
+            position: relative;
+            overflow: hidden;
+        }
+        .option-label:hover {
+            border-color: rgba(20,184,166,0.40);
+            background: rgba(20,184,166,0.04);
+            transform: translateX(3px);
+        }
+        .option-label.selected {
+            border-color: #14B8A6;
+            background: rgba(20,184,166,0.08);
+            box-shadow: 0 2px 12px rgba(20,184,166,0.12);
+        }
+        .option-label.selected .option-dot-outer {
+            border-color: #14B8A6;
+        }
+        .option-label.selected .option-dot-inner {
+            background: #14B8A6;
+            transform: scale(1);
+        }
+        .option-dot-outer {
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            border: 2px solid rgba(20,184,166,0.25);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            transition: border-color 0.2s;
+        }
+        .option-dot-inner {
+            width: 12px; height: 12px;
+            border-radius: 50%;
+            background: #14B8A6;
+            transform: scale(0);
+            transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        .option-key {
+            width: 32px; height: 32px;
+            border-radius: 8px;
+            background: rgba(20,184,166,0.08);
+            color: #0F766E;
+            font-size: 13px;
+            font-weight: 800;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+        .option-label.selected .option-key {
+            background: #14B8A6;
+            color: white;
+        }
+        .option-text {
+            font-size: 15px;
+            font-weight: 500;
+            color: #1a2e2c;
+            line-height: 1.5;
+            flex: 1;
+        }
+
+        /* ── PROGRESS BAR ── */
+        .progress-track {
+            width: 100%;
+            height: 6px;
+            background: rgba(20,184,166,0.12);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #14B8A6, #0F766E);
+            border-radius: 999px;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ── RESULT SCORE ── */
+        .score-ring {
+            width: 160px; height: 160px;
+            border-radius: 50%;
+            background: conic-gradient(#14B8A6 var(--pct, 0%), rgba(20,184,166,0.10) 0%);
+            display: flex; align-items: center; justify-content: center;
+            position: relative;
+            margin: 0 auto;
+        }
+        .score-ring::before {
+            content: '';
+            position: absolute;
+            inset: 10px;
+            border-radius: 50%;
+            background: white;
+        }
+        .score-inner {
+            position: relative; z-index: 1;
+            text-align: center;
+        }
+
+        /* ── ANIMATIONS ── */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.92); }
+            to   { opacity: 1; transform: scale(1); }
+        }
+        @keyframes slideRight {
+            from { opacity: 0; transform: translateX(-16px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(20,184,166,0.3); }
+            50%       { box-shadow: 0 0 0 12px rgba(20,184,166,0); }
+        }
+        @keyframes confetti-fall {
+            0%   { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+        .anim-fade-up   { animation: fadeUp   0.5s cubic-bezier(0.22,1,0.36,1) both; }
+        .anim-scale-in  { animation: scaleIn  0.4s cubic-bezier(0.22,1,0.36,1) both; }
+        .anim-fade-in   { animation: fadeIn   0.4s ease both; }
+        .delay-1 { animation-delay: 0.08s; }
+        .delay-2 { animation-delay: 0.16s; }
+        .delay-3 { animation-delay: 0.24s; }
+        .delay-4 { animation-delay: 0.32s; }
+
+        /* ── CONFETTI ── */
+        .confetti-piece {
+            position: fixed;
+            width: 10px; height: 10px;
+            border-radius: 2px;
+            animation: confetti-fall linear forwards;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        /* ── AUDIO BUTTON ── */
+        .audio-btn {
+            width: 40px; height: 40px;
+            border-radius: 12px;
+            background: rgba(20,184,166,0.10);
+            border: 1.5px solid rgba(20,184,166,0.20);
+            color: #0F766E;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 18px;
+        }
+        .audio-btn:hover {
+            background: rgba(20,184,166,0.18);
+            transform: scale(1.05);
+        }
+
+        /* ── CERT BUTTON ── */
+        .btn-cert {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 16px 24px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 20px rgba(245,158,11,0.35);
+        }
+        .btn-cert:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(245,158,11,0.45);
+        }
+
+        /* ── RESULT INFO CARD ── */
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(20,184,166,0.08);
+        }
+        .info-row:last-child { border-bottom: none; }
+        .info-key {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #7ab5af;
+        }
+        .info-val {
+            font-size: 14px;
+            font-weight: 700;
+            color: #0F766E;
+            text-align: right;
+            max-width: 60%;
+        }
+
+        /* ── SECTION DIVIDER ── */
+        .section-box {
+            background: rgba(20,184,166,0.04);
+            border: 1.5px solid rgba(20,184,166,0.12);
+            border-radius: 18px;
+            padding: 20px;
+        }
+
+        /* ── SWAL CUSTOM ── */
+        .swal2-popup { border-radius: 20px !important; font-family: 'Plus Jakarta Sans', sans-serif !important; }
+        .swal2-title { font-family: 'Plus Jakarta Sans', sans-serif !important; font-weight: 800 !important; }
+        .swal2-confirm { border-radius: 12px !important; font-weight: 700 !important; }
+
+        /* ── STATUS BADGE ── */
+        .status-lulus {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 8px 24px;
+            background: linear-gradient(135deg, #14B8A6, #0F766E);
+            color: white;
+            border-radius: 999px;
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            box-shadow: 0 4px 16px rgba(15,118,110,0.30);
+            animation: pulse-glow 2s infinite;
+        }
+        .status-belum {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 8px 24px;
+            background: linear-gradient(135deg, #f87171, #dc2626);
+            color: white;
+            border-radius: 999px;
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+        }
+
+        /* ── QUESTION NUMBER ── */
+        .q-number {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 32px; height: 32px;
+            border-radius: 9px;
+            background: linear-gradient(135deg, #14B8A6, #0F766E);
+            color: white;
+            font-size: 13px;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 640px) {
+            .custom-select, .custom-input { font-size: 16px; }
+            .score-ring { width: 130px; height: 130px; }
+        }
+
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── BACKGROUND CANVAS ── -->
+<div class="bg-canvas" aria-hidden="true">
+    <div class="bg-pattern"></div>
+    <div class="bg-blob blob-1"></div>
+    <div class="bg-blob blob-2"></div>
+    <div class="bg-blob blob-3"></div>
+</div>
+
+<!-- ── AUDIO ── -->
+<audio id="bg-audio" loop preload="none">
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3" type="audio/mpeg">
+</audio>
+
+<!-- ── HEADER ── -->
+<header class="site-header sticky top-0 z-50">
+    <div class="max-w-2xl mx-auto px-5 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <!-- Logo SVG inline (open book + S) -->
+            <div class="logo-mark">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2 7C2 7 5 5 12 5C19 5 22 7 22 7V19C22 19 19 17 12 17C5 17 2 19 2 19V7Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+                    <path d="M12 5V17" stroke="white" stroke-width="2"/>
+                </svg>
+            </div>
+            <div>
+                <div class="text-base font-black text-brand-900 leading-none tracking-tight">SobatNgaji</div>
+                <div class="text-[10px] font-medium text-brand-600 leading-none mt-0.5 hidden sm:block">Dilihat Menyenangkan · Dipelajari Memudahkan</div>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="badge badge-teal hidden sm:inline-flex">
+                <span class="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse"></span>
+                Platform Kuis
+            </span>
+            <button id="audio-toggle" class="audio-btn" title="Toggle Audio" aria-label="Toggle background audio">🔇</button>
+        </div>
+    </div>
+</header>
+
+<!-- ── MAIN ── -->
+<main class="relative z-10 max-w-2xl mx-auto px-4 py-8 pb-16">
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- SECTION 1: SETUP FORM -->
+    <!-- ═══════════════════════════════════════ -->
+    <section id="setup-section">
+        <!-- Hero intro -->
+        <div class="text-center mb-8 anim-fade-up">
+            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-700 text-xs font-700 uppercase tracking-widest mb-4">
+                <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
+                Kuis Interaktif
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-black text-brand-900 leading-tight mb-2">
+                Uji Pemahamanmu
+            </h1>
+            <p class="text-brand-700/70 text-base font-medium">Pilih materi dan mulai kuis sekarang</p>
+        </div>
+
+        <!-- Form card -->
+        <div class="glass-strong rounded-3xl p-6 sm:p-8 anim-fade-up delay-1">
+            <form id="setup-form" class="space-y-5">
+
+                <!-- Nama -->
+                <div>
+                    <label class="field-label">Nama Lengkap</label>
+                    <input type="text" id="nama" required class="custom-input" placeholder="Masukkan nama lengkap Anda">
+                </div>
+
+                <!-- Guru -->
+                <div>
+                    <label class="field-label">Guru Pengampu</label>
+                    <div class="custom-select-wrapper">
+                        <select id="guru" required class="custom-select">
+                            <option value="" disabled selected>Pilih Guru...</option>
+                            <option value="Ust. Abdul Rozaq Amir">Ust. Abdul Rozaq Amir</option>
+                            <option value="Ust. Ari Abdullah">Ust. Ari Abdullah</option>
+                            <option value="Ust. Asep Maulana">Ust. Asep Maulana</option>
+                            <option value="Ust. Aziz Rizki Sallam">Ust. Aziz Rizki Sallam</option>
+                            <option value="Ustzh. Belia Puspitasari">Ustzh. Belia Puspitasari</option>
+                            <option value="Ust. Cecep Maolana">Ust. Cecep Maolana</option>
+                            <option value="Ustzh. Dela Arnes Septiani">Ustzh. Dela Arnes Septiani</option>
+                            <option value="Ust. Gilang Pradana">Ust. Gilang Pradana</option>
+                            <option value="Ust. Hadid Humaid Saifuddin">Ust. Hadid Humaid Saifuddin</option>
+                            <option value="Ust. Muhammad Nashrul Umam">Ust. Muhammad Nashrul Umam</option>
+                            <option value="Ust. Muhammad Sukrillah">Ust. Muhammad Sukrillah</option>
+                            <option value="Ust. Ryan Abdurrahman">Ust. Ryan Abdurrahman</option>
+                            <option value="Ustzh. Shofi Jamilatussirin">Ustzh. Shofi Jamilatussirin</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 2-col: Jenis + Program -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="field-label">Jenis Kuis</label>
+                        <div class="custom-select-wrapper">
+                            <select id="jenis" required class="custom-select">
+                                <option value="" disabled selected>Pilih...</option>
+                                <option value="Pertemuan">Kuis Pertemuan</option>
+                                <option value="Kenaikan">Kuis Kenaikan Level</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="field-label">Program</label>
+                        <div class="custom-select-wrapper">
+                            <select id="program" required class="custom-select">
+                                <option value="" disabled selected>Pilih...</option>
+                                <option value="Tahsin">Tahsin</option>
+                                <option value="Tikror">Tikror</option>
+                                <option value="Makhroj">Makhroj</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dynamic fields -->
+                <div id="dynamic-fields" class="section-box space-y-4" style="display:none;">
+
+                    <div id="div-level" class="hidden">
+                        <label class="field-label">Level</label>
+                        <div class="custom-select-wrapper">
+                            <select id="level" class="custom-select"></select>
+                        </div>
+                    </div>
+
+                    <div id="div-modul" class="hidden">
+                        <label class="field-label">Modul</label>
+                        <div class="custom-select-wrapper">
+                            <select id="modul" class="custom-select">
+                                <option value="A">Modul A</option>
+                                <option value="B">Modul B</option>
+                                <option value="C">Modul C</option>
+                                <option value="D">Modul D</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="div-pertemuan" class="hidden">
+                        <label class="field-label">Pertemuan</label>
+                        <div class="custom-select-wrapper">
+                            <select id="pertemuan" class="custom-select"></select>
+                        </div>
+                    </div>
+
+                    <div id="div-kategori" class="hidden">
+                        <label class="field-label">Kategori Makhroj</label>
+                        <div class="custom-select-wrapper">
+                            <select id="kategori" class="custom-select">
+                                <option value="Muqoddimah Makhroj">Muqoddimah Makhroj</option>
+                                <option value="Sifatul Huruf">Sifatul Huruf</option>
+                                <option value="Al Jauf">Al Jauf</option>
+                                <option value="Al Khaisyum">Al Khaisyum</option>
+                                <option value="Hamzah">Hamzah</option>
+                                <option value="Ha Kecil">Ha Kecil</option>
+                                <option value="Ain">Ain</option>
+                                <option value="Ha Besar">Ha Besar</option>
+                                <option value="Ghain">Ghain</option>
+                                <option value="Kha">Kha</option>
+                                <option value="Latihan QS Al-A'la">Latihan QS Al-A'la</option>
+                                <option value="Makhroj Lisan">Makhroj Lisan</option>
+                                <option value="Qaf">Qaf</option>
+                                <option value="Kaf">Kaf</option>
+                                <option value="Jim">Jim</option>
+                                <option value="Syin">Syin</option>
+                                <option value="Ya">Ya</option>
+                                <option value="Dhad">Dhad</option>
+                                <option value="Lam">Lam</option>
+                                <option value="Nun">Nun</option>
+                                <option value="Ra">Ra</option>
+                                <option value="Tha">Tha</option>
+                                <option value="Dal">Dal</option>
+                                <option value="Ta">Ta</option>
+                                <option value="Shad">Shad</option>
+                                <option value="Zai">Zai</option>
+                                <option value="Sin">Sin</option>
+                                <option value="Zha">Zha</option>
+                                <option value="Dzal">Dzal</option>
+                                <option value="Tsa">Tsa</option>
+                                <option value="Latihan QS Al-Buruj">Latihan QS Al-Buruj</option>
+                                <option value="Wau">Wau</option>
+                                <option value="Ba">Ba</option>
+                                <option value="Fa">Fa</option>
+                                <option value="Mim">Mim</option>
+                                <option value="Pola Metode Banaba Semua Huruf">Pola Metode Banaba Semua Huruf</option>
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+
+                <button type="submit" class="btn-primary mt-2">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    Mulai Kuis Sekarang
+                </button>
+
+            </form>
+        </div>
+
+        <!-- Footer note -->
+        <p class="text-center text-xs text-brand-600/50 mt-6 font-medium anim-fade-up delay-2">
+            Dilihat Menyenangkan · Dipelajari Memudahkan
+        </p>
+    </section>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- SECTION 2: QUIZ -->
+    <!-- ═══════════════════════════════════════ -->
+    <section id="quiz-section" class="hidden">
+
+        <!-- Sticky progress bar -->
+        <div id="quiz-sticky-header" class="glass sticky top-[73px] z-40 rounded-2xl px-5 py-3 mb-6 flex items-center gap-4">
+            <div class="flex-1">
+                <div class="flex justify-between items-center mb-1.5">
+                    <span class="text-xs font-700 text-brand-700 uppercase tracking-wider">Progress</span>
+                    <span id="progress-text" class="text-xs font-800 text-brand-700">0/0</span>
+                </div>
+                <div class="progress-track">
+                    <div id="progress-bar-fill" class="progress-fill" style="width:0%"></div>
+                </div>
+            </div>
+            <div id="progress-count-pill" class="badge badge-teal text-[11px]">0 dijawab</div>
+        </div>
+
+        <!-- Questions -->
+        <form id="quiz-form">
+            <div id="questions-container" class="space-y-5"></div>
+            <div class="mt-8">
+                <button type="submit" class="btn-primary">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    Kirim Jawaban
+                </button>
+            </div>
+        </form>
+    </section>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- SECTION 3: RESULT -->
+    <!-- ═══════════════════════════════════════ -->
+    <section id="result-section" class="hidden">
+        <div class="glass-strong rounded-3xl p-6 sm:p-10 text-center anim-scale-in">
+
+            <!-- Emoji + heading -->
+            <div id="result-emoji" class="text-5xl mb-3">🌟</div>
+            <h2 id="result-heading" class="text-2xl font-black text-brand-900 mb-1">Alhamdulillah!</h2>
+            <p id="result-subtext" class="text-brand-700/60 text-sm font-medium mb-8">Kuis selesai</p>
+
+            <!-- Score ring -->
+            <div class="score-ring mb-6" id="score-ring">
+                <div class="score-inner">
+                    <div id="result-score" class="text-4xl font-black text-brand-700">0</div>
+                    <div class="text-xs font-700 text-brand-500 uppercase tracking-wider">Nilai</div>
+                </div>
+            </div>
+
+            <!-- Correct count -->
+            <p id="result-correct-count" class="text-sm font-600 text-brand-700/70 mb-6">Jawaban benar: 0 dari 0 soal</p>
+
+            <!-- Status badge -->
+            <div class="mb-8">
+                <div id="result-status"></div>
+            </div>
+
+            <!-- Cert button -->
+            <div id="cert-container" class="hidden mb-6">
+                <button onclick="unduhSertifikat()" class="btn-cert">
+                    <span class="text-xl">🏆</span>
+                    Unduh Sertifikat Kenaikan
+                </button>
+            </div>
+
+            <!-- Info details -->
+            <div class="section-box text-left mb-6">
+                <div class="info-row">
+                    <span class="info-key">Guru</span>
+                    <span class="info-val" id="res-guru">—</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-key">Program</span>
+                    <span class="info-val" id="res-program">—</span>
+                </div>
+                <div class="info-row" id="wrap-res-level">
+                    <span class="info-key">Level</span>
+                    <span class="info-val" id="res-level">—</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-key" id="label-res-modul">Modul</span>
+                    <span class="info-val" id="res-modul">—</span>
+                </div>
+                <div class="info-row" id="wrap-res-pertemuan">
+                    <span class="info-key">Pertemuan</span>
+                    <span class="info-val" id="res-pertemuan">—</span>
+                </div>
+            </div>
+
+            <!-- Back button -->
+            <button onclick="location.reload()" class="w-full py-3 px-6 rounded-2xl border-2 border-brand-200 text-brand-700 font-700 text-sm hover:bg-brand-50 transition-all duration-200">
+                ← Kembali ke Awal
+            </button>
+
+            <p class="text-xs text-brand-600/40 font-medium mt-6 italic">
+                Dilihat Menyenangkan · Dipelajari Memudahkan
+            </p>
+        </div>
+    </section>
+
+</main>
+
+<!-- ── SCRIPTS ── -->
+<script>
+    // ════════════════════════════════════════
+    // AUDIO
+    // ════════════════════════════════════════
+    const audio = document.getElementById('bg-audio');
+    const audioBtn = document.getElementById('audio-toggle');
+    let audioUnlocked = false;
+    let audioOn = false;
+    audio.volume = 0.08;
+
+    function unlockAudio() {
+        if (!audioUnlocked) {
+            audioUnlocked = true;
+            document.removeEventListener('click', unlockAudio);
+        }
+    }
+    document.addEventListener('click', unlockAudio, { once: true });
+
+    audioBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (!audioUnlocked) { unlockAudio(); }
+        if (audioOn) {
+            audio.pause();
+            audioBtn.textContent = '🔇';
+            audioOn = false;
+        } else {
+            audio.play().catch(() => {});
+            audioBtn.textContent = '🔊';
+            audioOn = true;
+        }
+    });
+
+    // ════════════════════════════════════════
+    // API + STATE
+    // ════════════════════════════════════════
+    const API_URL = 'https://script.google.com/macros/s/AKfycbzeADK2epnaT64sqH9qqSHEdlePc0kfWiJuGsJS4f8VzSxj5mXIL0ZxC7LE9sLx7y2D/exec';
+
+    const formSetup   = document.getElementById('setup-form');
+    const formQuiz    = document.getElementById('quiz-form');
+    const jenisSelect = document.getElementById('jenis');
+    const programSelect = document.getElementById('program');
+    const levelSelect = document.getElementById('level');
+    const modulSelect = document.getElementById('modul');
+    const pertemuanSelect = document.getElementById('pertemuan');
+
+    const divLevel    = document.getElementById('div-level');
+    const divModul    = document.getElementById('div-modul');
+    const divPertemuan = document.getElementById('div-pertemuan');
+    const divKategori = document.getElementById('div-kategori');
+    const dynamicFields = document.getElementById('dynamic-fields');
+
+    let questionsData = [];
+    let answersData   = {};
+    let certPayloadData = {};
+
+    // ════════════════════════════════════════
+    // CURRICULUM MAPPING
+    // ════════════════════════════════════════
+    const LABEL_TIKROR = {
+        1:  'Huruf Hamzah (ء) dan Ba (ب)',
+        2:  'Huruf Ta (ت)',
+        3:  'Huruf Tsa (ث) dan Jim (ج)',
+        4:  'Huruf Ha (ح) dan Kha (خ)',
+        5:  'Huruf Dal (د) dan Dzal (ذ)',
+        6:  'Huruf Ra (ر) dan Zai (ز)',
+        7:  'Huruf Sin (س) dan Syin (ش)',
+        8:  'Huruf Shad (ص) dan Dhad (ض)',
+        9:  'Huruf Tha (ط) dan Zha (ظ)',
+        10: 'Huruf Ain (ع) dan Ghain (غ)',
+        11: 'Huruf Fa (ف) dan Qaf (ق)',
+        12: 'Huruf Kaf (ك) dan Lam (ل)',
+        13: 'Huruf Mim (م) dan Nun (ن)',
+        14: 'Huruf Wau (و), Ha (هـ), Ya (ي)',
+        15: 'Harakat',
+        16: 'Huruf Sambung',
+        17: 'Mad 2 Harakat (Fathah + Alif)',
+        18: 'Mad 2 Harakat (Fathah Berdiri)',
+        19: 'Mad 2 Harakat (Kasrah + Ya Sukun)',
+        20: 'Mad 2 Harakat (Dhammah + Wau Sukun)',
+        21: 'Talaqqi Al Fatihah',
+        22: 'Tanwin',
+        23: 'Ta Marbuthah',
+        24: 'Huruf Sukun',
+        25: "Huruf Sukun dengan Sifat Isti'la",
+        26: 'Huruf Sukun dengan Sifat Syiddah',
+        27: 'Latihan Huruf Sukun Syiddah & Qalqalah',
+        28: 'Huruf Sukun dengan Sifat Rakhawah',
+        29: 'Huruf Sukun pada Huruf Alif Lam',
+        30: 'Tasydid pada Huruf Nun dan Mim',
+        31: 'Tasydid pada Huruf Alif Lam',
+        32: 'Latihan Huruf Lam Bertasydid'
+    };
+
+    const LABEL_TAHSIN = {
+        'Tahsin 1': {
+            'A': {
+                1: 'Rumus 1 Detik Hafal 7 Tanda Mad 2 Harakat',
+                2: 'Pola Asyik Mad 2 Harakat',
+                3: '28 Pola Mad 2 Harakat',
+                4: 'Latihan Level 1 Mad 2 Harakat',
+                5: 'Latihan Level 2 Mad 2 Harakat',
+                6: 'Mad Iwadh & Mad Shilah',
+                7: 'Mad Aridh & Mad Lin',
+                8: 'Talaqqi QS Taha Ayat 55–57'
+            },
+            'B': {
+                1: 'Mad Wajib Muttashil & Mad Jaiz Munfashil',
+                2: 'Mad Jaiz menurut Thariqah Syathibi & Jazari',
+                3: 'Makna Mad Wajib & Mad Jaiz',
+                4: 'Mad Jaiz Munfashil Haqiqi'
+            },
+            'C': {
+                1: 'Mad Lazim Mutsaqqal Kalimi',
+                2: 'Latihan Mad 6 Harakat Level 1',
+                3: 'Latihan Mad 6 Harakat Level 2',
+                4: 'Makna Mad Lazim'
+            },
+            'D': {
+                1: 'Alif Lam Syamsiyyah',
+                2: 'Alif Lam Qamariyyah',
+                3: 'Huruf Fawatihus Suwar',
+                4: 'Talaqqi QS Asy-Syura Ayat 1–6'
+            }
+        },
+        'Tahsin 2': {
+            'A': {
+                1: 'Ghunnah Musyaddadah & Idgham Mimi',
+                2: 'Latihan Ghunnah',
+                3: 'Idgham Bighunnah',
+                4: 'Talaqqi QS Az-Zalzalah'
+            },
+            'B': {
+                1: 'Ikhfa Syafawi',
+                2: 'Iqlab',
+                3: 'Ikhfa Haqiqi',
+                4: 'Talaqqi QS At-Tahrim'
+            },
+            'C': {
+                1: 'Idzhar Halqi',
+                2: 'Idzhar Syafawi'
+            },
+            'D': {
+                1: 'Qalqalah Sughra & Kubra',
+                2: 'Talaqqi QS Al-Lahab'
+            }
+        }
+    };
+
+    // ════════════════════════════════════════
+    // FORM UI LOGIC
+    // ════════════════════════════════════════
+    jenisSelect.addEventListener('change', updateFormUI);
+    programSelect.addEventListener('change', updateFormUI);
+    levelSelect.addEventListener('change', updatePertemuanOptions);
+    modulSelect.addEventListener('change', updatePertemuanOptions);
+
+    function showDynamic() {
+        dynamicFields.style.display = '';
+        dynamicFields.style.animation = 'fadeUp 0.3s ease both';
+    }
+    function hideDynamic() { dynamicFields.style.display = 'none'; }
+
+    function updateFormUI() {
+        const prog  = programSelect.value;
+        const jenis = jenisSelect.value;
+
+        divLevel.classList.add('hidden');
+        divModul.classList.add('hidden');
+        divPertemuan.classList.add('hidden');
+        divKategori.classList.add('hidden');
+        levelSelect.innerHTML = '';
+
+        if (!prog || !jenis) { hideDynamic(); return; }
+
+        showDynamic();
+
+        if (prog === 'Tahsin') {
+            divLevel.classList.remove('hidden');
+            if (jenis === 'Pertemuan') {
+                divModul.classList.remove('hidden');
+                divPertemuan.classList.remove('hidden');
+            }
+            levelSelect.innerHTML = '<option value="Tahsin 1">Tahsin 1</option><option value="Tahsin 2">Tahsin 2</option>';
+            updatePertemuanOptions();
+        } else if (prog === 'Tikror') {
+            divLevel.classList.remove('hidden');
+            if (jenis === 'Pertemuan') divPertemuan.classList.remove('hidden');
+            levelSelect.innerHTML = '<option value="Tikror 1">Tikror 1</option><option value="Tikror 2">Tikror 2</option><option value="Tikror 3">Tikror 3</option>';
+            updatePertemuanOptions();
+        } else if (prog === 'Makhroj') {
+            divKategori.classList.remove('hidden');
+        }
+    }
+
+    function isiPertemuan(start, end) {
+        pertemuanSelect.innerHTML = '';
+        for (let i = start; i <= end; i++) {
+            const lbl = LABEL_TIKROR[i] ? `Pertemuan ${i} — ${LABEL_TIKROR[i]}` : `Pertemuan ${i}`;
+            pertemuanSelect.innerHTML += `<option value="${i}">${lbl}</option>`;
+        }
+    }
+
+    function updatePertemuanOptions() {
+        const prog  = programSelect.value;
+        pertemuanSelect.innerHTML = '';
+
+        if (prog === 'Tahsin') {
+            const level = levelSelect.value;
+            const modul = modulSelect.value;
+            let max = 4;
+            if (level === 'Tahsin 1' && modul === 'A') max = 8;
+            else if (level === 'Tahsin 2' && (modul === 'C' || modul === 'D')) max = 2;
+            else max = 4;
+
+            for (let i = 1; i <= max; i++) {
+                const lbl = LABEL_TAHSIN[level] && LABEL_TAHSIN[level][modul] && LABEL_TAHSIN[level][modul][i];
+                const text = lbl ? `Pertemuan ${i} — ${lbl}` : `Pertemuan ${i}`;
+                pertemuanSelect.innerHTML += `<option value="${i}">${text}</option>`;
+            }
+        } else if (prog === 'Tikror') {
+            if (levelSelect.value === 'Tikror 1') { isiPertemuan(1, 14); return; }
+            if (levelSelect.value === 'Tikror 2') { isiPertemuan(15, 21); return; }
+            if (levelSelect.value === 'Tikror 3') { isiPertemuan(22, 32); return; }
+        }
+    }
+
+    // ════════════════════════════════════════
+    // FORM SUBMIT → FETCH QUESTIONS
+    // ════════════════════════════════════════
+    formSetup.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const jenis = jenisSelect.value;
+        const prog  = programSelect.value;
+
+        let params = new URLSearchParams({ action: 'getQuestions', program: prog, jenis: jenis });
+
+        if (prog === 'Tahsin') {
+            params.append('level', levelSelect.value);
+            if (jenis === 'Pertemuan') {
+                params.append('modul', modulSelect.value);
+                params.append('pertemuan', pertemuanSelect.value);
+            }
+        } else if (prog === 'Tikror') {
+            params.append('level', levelSelect.value);
+            if (jenis === 'Pertemuan') params.append('pertemuan', pertemuanSelect.value);
+        } else if (prog === 'Makhroj') {
+            params.append('kategori', document.getElementById('kategori').value);
+        }
+
+        Swal.fire({
+            title: 'Menyiapkan Soal...',
+            html: '<span style="font-family:Plus Jakarta Sans,sans-serif;color:#0F766E">Mohon tunggu sebentar ya 🕌</span>',
+            allowOutsideClick: false,
+            didOpen: () => { Swal.showLoading(); }
+        });
+
+        try {
+            const response = await fetch(`${API_URL}?${params.toString()}`);
+            const data = await response.json();
+            if (data.success === false) throw new Error(data.message);
+            if (!data || data.length === 0) throw new Error('Bank soal kosong atau soal belum tersedia.');
+
+            questionsData = data;
+            answersData   = {};
+            renderQuestions();
+
+            document.getElementById('setup-section').classList.add('hidden');
+            document.getElementById('quiz-section').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            Swal.close();
+        } catch (error) {
+            Swal.fire({ icon: 'error', title: 'Mohon Maaf', text: error.message, confirmButtonColor: '#0F766E' });
+        }
+    });
+
+    // ════════════════════════════════════════
+    // RENDER QUESTIONS
+    // ════════════════════════════════════════
+    function renderQuestions() {
+        const container = document.getElementById('questions-container');
+        container.innerHTML = '';
+
+        questionsData.forEach((q, index) => {
+            const no = index + 1;
+            const delay = Math.min(index * 0.06, 0.4);
+            const html = `
+                <div class="glass-strong rounded-2xl p-6 anim-fade-up" style="animation-delay:${delay}s">
+                    <div class="flex items-start gap-3 mb-5">
+                        <div class="q-number">${no}</div>
+                        <h3 class="text-base font-700 text-brand-900 leading-relaxed pt-0.5 flex-1">${q.soal}</h3>
+                    </div>
+                    <div class="space-y-3" id="opts-${index}">
+                        ${['A','B','C','D'].map(opt => `
+                            <label class="option-label" id="lbl-${index}-${opt}">
+                                <input type="radio" name="q${index}" value="${opt}"
+                                    class="sr-only"
+                                    onchange="selectOption(${index}, '${opt}')">
+                                <div class="option-dot-outer">
+                                    <div class="option-dot-inner"></div>
+                                </div>
+                                <div class="option-key">${opt}</div>
+                                <span class="option-text">${q[opt]}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            container.innerHTML += html;
+        });
+        updateProgressUI();
+    }
+
+    window.selectOption = function(index, value) {
+        // Clear all options for this question
+        ['A','B','C','D'].forEach(opt => {
+            const lbl = document.getElementById(`lbl-${index}-${opt}`);
+            if (lbl) lbl.classList.remove('selected');
+        });
+        // Mark selected
+        const selected = document.getElementById(`lbl-${index}-${value}`);
+        if (selected) selected.classList.add('selected');
+
+        answersData[index] = value;
+        updateProgressUI();
+    };
+
+    // Keep backward compat
+    window.updateProgress = window.selectOption;
+
+    function updateProgressUI() {
+        const total    = questionsData.length;
+        const answered = Object.keys(answersData).length;
+        const pct      = total ? (answered / total) * 100 : 0;
+
+        document.getElementById('progress-bar-fill').style.width = `${pct}%`;
+        document.getElementById('progress-text').innerText = `${answered}/${total}`;
+        document.getElementById('progress-count-pill').innerText = `${answered} dijawab`;
+    }
+
+    // ════════════════════════════════════════
+    // QUIZ SUBMIT
+    // ════════════════════════════════════════
+    formQuiz.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const totalSoal = questionsData.length;
+        const dijawab   = Object.keys(answersData).length;
+
+        if (dijawab < totalSoal) {
+            Swal.fire({ icon: 'warning', title: 'Masih Ada Soal', text: 'Harap jawab semua soal terlebih dahulu.', confirmButtonColor: '#0F766E' });
+            return;
+        }
+
+        let benar = 0;
+        questionsData.forEach((q, i) => { if (answersData[i] === q.kunci) benar++; });
+
+        const nilai      = Math.round((benar / totalSoal) * 100);
+        const statusText = nilai >= 80 ? 'Lulus' : 'Belum Lulus';
+        const jenis      = jenisSelect.value;
+        const prog       = programSelect.value;
+
+        const payload = {
+            nama:      document.getElementById('nama').value,
+            guru:      document.getElementById('guru').value,
+            program:   prog,
+            level:     (prog === 'Makhroj') ? '-' : levelSelect.value,
+            modul:     (prog === 'Tahsin' && jenis === 'Pertemuan') ? modulSelect.value : (prog === 'Makhroj' ? document.getElementById('kategori').value : '-'),
+            pertemuan: (prog !== 'Makhroj' && jenis === 'Pertemuan') ? pertemuanSelect.value : '-',
+            nilai:     nilai,
+            status:    statusText
+        };
+
+        Swal.fire({
+            title: 'Mengirim Jawaban...',
+            html: '<span style="font-family:Plus Jakarta Sans,sans-serif;color:#0F766E">Semoga hasilnya maksimal! 🤲</span>',
+            allowOutsideClick: false,
+            didOpen: () => { Swal.showLoading(); }
+        });
+
+        try {
+            await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload)
+            });
+            tampilkanHasil(payload, jenis, benar, totalSoal);
+        } catch (error) {
+            tampilkanHasil(payload, jenis, benar, totalSoal);
+        }
+    });
+
+    // ════════════════════════════════════════
+    // CONFETTI
+    // ════════════════════════════════════════
+    function launchConfetti() {
+        const colors = ['#14B8A6','#0F766E','#99f6e9','#fbbf24','#34d399','#5eead6'];
+        for (let i = 0; i < 80; i++) {
+            const el = document.createElement('div');
+            el.className = 'confetti-piece';
+            el.style.left = Math.random() * 100 + 'vw';
+            el.style.top  = '-12px';
+            el.style.background = colors[Math.floor(Math.random() * colors.length)];
+            el.style.width  = (6 + Math.random() * 8) + 'px';
+            el.style.height = (6 + Math.random() * 8) + 'px';
+            el.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+            el.style.animationDuration = (2 + Math.random() * 2) + 's';
+            el.style.animationDelay    = (Math.random() * 0.8) + 's';
+            document.body.appendChild(el);
+            el.addEventListener('animationend', () => el.remove());
+        }
+    }
+
+    // ════════════════════════════════════════
+    // TAMPILKAN HASIL
+    // ════════════════════════════════════════
+    function tampilkanHasil(data, jenisKuis, benar, totalSoal) {
+        Swal.close();
+        document.getElementById('quiz-section').classList.add('hidden');
+        document.getElementById('result-section').classList.remove('hidden');
+
+        // Score ring
+        const pct = data.nilai;
+        document.getElementById('score-ring').style.setProperty('--pct', pct + '%');
+        document.getElementById('result-score').innerText = data.nilai;
+        document.getElementById('result-correct-count').innerText = `Jawaban benar: ${benar} dari ${totalSoal} soal`;
+
+        // Status
+        const statusEl = document.getElementById('result-status');
+        if (data.status === 'Lulus') {
+            document.getElementById('result-emoji').innerText   = '🏆';
+            document.getElementById('result-heading').innerText = 'Alhamdulillah, Lulus!';
+            document.getElementById('result-subtext').innerText = 'Terus semangat belajar Al-Qur\'an';
+            statusEl.innerHTML = '<div class="status-lulus">✅ LULUS</div>';
+            setTimeout(launchConfetti, 300);
+
+            if (jenisKuis === 'Kenaikan') {
+                document.getElementById('cert-container').classList.remove('hidden');
+                certPayloadData = {
+                    nama:    data.nama,
+                    program: data.program,
+                    level:   data.program === 'Makhroj' ? data.modul : data.level
+                };
+            }
+        } else {
+            document.getElementById('result-emoji').innerText   = '📚';
+            document.getElementById('result-heading').innerText = 'Belum Lulus';
+            document.getElementById('result-subtext').innerText = 'Jangan menyerah, terus berlatih!';
+            statusEl.innerHTML = '<div class="status-belum">📚 BELUM LULUS</div>';
+        }
+
+        // Info rows
+        document.getElementById('res-guru').innerText    = data.guru;
+        document.getElementById('res-program').innerText = data.program;
+
+        if (data.program === 'Makhroj') {
+            document.getElementById('wrap-res-level').classList.add('hidden');
+            document.getElementById('wrap-res-pertemuan').classList.add('hidden');
+            document.getElementById('label-res-modul').innerText = 'Kategori';
+            document.getElementById('res-modul').innerText = data.modul;
+        } else if (data.program === 'Tikror') {
+            document.getElementById('wrap-res-level').classList.remove('hidden');
+            document.getElementById('res-level').innerText  = data.level;
+            document.getElementById('label-res-modul').innerText = 'Modul';
+            document.getElementById('res-modul').innerText  = '—';
+            if (data.pertemuan === '-') {
+                document.getElementById('wrap-res-pertemuan').classList.add('hidden');
+            } else {
+                document.getElementById('wrap-res-pertemuan').classList.remove('hidden');
+                document.getElementById('res-pertemuan').innerText = data.pertemuan;
+            }
+        } else {
+            document.getElementById('wrap-res-level').classList.remove('hidden');
+            document.getElementById('res-level').innerText  = data.level;
+            document.getElementById('label-res-modul').innerText = 'Modul';
+            document.getElementById('res-modul').innerText  = data.modul;
+            if (data.pertemuan === '-') {
+                document.getElementById('wrap-res-pertemuan').classList.add('hidden');
+            } else {
+                document.getElementById('wrap-res-pertemuan').classList.remove('hidden');
+                document.getElementById('res-pertemuan').innerText = data.pertemuan;
+            }
+        }
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ════════════════════════════════════════
+    // SERTIFIKAT
+    // ════════════════════════════════════════
+    async function unduhSertifikat() {
+        if (!certPayloadData || !certPayloadData.program) {
+            Swal.fire({ icon: 'error', title: 'Gagal', text: 'Data peserta tidak lengkap.', confirmButtonColor: '#0F766E' });
+            return;
+        }
+        Swal.fire({
+            title: 'Membuat Sertifikat...',
+            html: '<span style="font-family:Plus Jakarta Sans,sans-serif;color:#0F766E">Mohon tunggu sebentar ya 🎓</span>',
+            allowOutsideClick: false,
+            didOpen: () => { Swal.showLoading(); }
+        });
+        try {
+            const getParams = new URLSearchParams({
+                action:  'certificate',
+                nama:    certPayloadData.nama,
+                program: certPayloadData.program,
+                level:   certPayloadData.level
+            });
+            const response = await fetch(`${API_URL}?${getParams.toString()}`);
+            const res = await response.json();
+            if (res.status === 'success' || res.success === true) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Alhamdulillah Berhasil!',
+                    text: 'Sertifikat Anda telah siap.',
+                    confirmButtonText: 'Buka Sertifikat 🏆',
+                    confirmButtonColor: '#0F766E'
+                }).then((result) => {
+                    if (result.isConfirmed && res.url) window.open(res.url, '_blank');
+                });
+            } else {
+                throw new Error(res.message || 'Terjadi kesalahan sistem di server.');
+            }
+        } catch (error) {
+            Swal.fire({ icon: 'error', title: 'Mohon Maaf', text: 'Gagal membuat sertifikat: ' + error.message, confirmButtonColor: '#0F766E' });
+        }
+    }
+
+    // Expose globally
+    window.unduhSertifikat = unduhSertifikat;
+</script>
+
+</body>
+</html>
